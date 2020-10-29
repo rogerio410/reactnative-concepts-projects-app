@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   View,
-  FlatList,
   Text,
   StatusBar,
   StyleSheet,
@@ -19,18 +18,18 @@ export default function App() {
   useEffect(() => {
     api.get('/repositories').then(response => {
       setRepositories(response.data)
-      console.log('result', response.data)
     })
   }, [])
 
-  async function handleLikeRepository(id) {
-    const response = await api.post(`/repositories/${id}/like`)
+  function handleLikeRepository(id) {
+    api.post(`/repositories/${id}/like`).then(response => {
+      const repo = response.data
 
-    const repo = response.data
+      const repoIndex = repositories.findIndex(r => r.id == id)
 
-    const repoIndex = repositories.findIndex(repo => repo.id == id)
-    repositories[repoIndex] = repo
-    setRepositories([...repositories])
+      repositories[repoIndex] = repo
+      setRepositories([...repositories])
+    })
   }
 
   return (
@@ -43,7 +42,7 @@ export default function App() {
             <Text style={styles.repository}>{repo.title}</Text>
 
             <View style={styles.techsContainer}>
-              {repo.tech.map(tech => (
+              {repo.techs.map(tech => (
                 <Text key={tech} style={styles.tech}>
                   {tech}
                 </Text>
